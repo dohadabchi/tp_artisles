@@ -67,25 +67,34 @@ class UserController extends Controller
         return redirect()->route('articles.index')->with('success', 'Article supprimé avec succès');
     }
 
-    public function details($id){
-        $article=Article::findOrFail($id);
-        $comment=Commentaire::all()->where('article_id', $id);
-        return view('articles.details',compact('article','comment'));
+    public function details($id)
+    {
+        $article = Article::findOrFail($id);
+        $comments = Commentaire::where('article_id', $id)->get();
+        
+        return view('articles.details', compact('article', 'comments'));
     }
 
-    public function comment($id){
-        return view('articles.createcomment');
+    public function comment($id)
+    {
+        $article = Article::findOrFail($id);
+        return view('articles.createcomment', compact('article'));
     }
+    
+    public function storeComment(Request $request, $id)
+{
+    
+    $request->validate([
+        'contenu' => 'required|min:3',
+    ]);
+    
+    $comment = new Commentaire();
+    $comment->contenu = $request->contenu;
+    $comment->date = now();
+    $comment->article_id = $id;
+    $comment->user_id = Auth::user()->id;
+    $comment->save(); 
 
-    public function createcomment(Request $request,$id){
-        $request->validate([
-            'contenu',
-        ]);
-
-        $comment=new Commentaire();
-        $comment->contenu=$request->contenu;
-        $comment->date=now();
-        $comment->article_id=$id;
-        $comment->user_id=Auth::user()->id;
-    }
+    return redirect()->route('articles.details', $id)->with('success', 'Commentaire ajouté avec succès!');
+}
 }

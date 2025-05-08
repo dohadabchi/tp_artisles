@@ -5,11 +5,10 @@ use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect root to articles index
-Route::get('/', function () {
-    return redirect()->route('articles.index');
-});
 
+Route::get('/', function () {
+    return redirect()->route('register');
+});
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -28,6 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/articles/{id}/edit', [UserController::class, 'edit'])->name('articles.edit');
     Route::put('/articles/{id}', [UserController::class, 'update'])->name('articles.update');
     Route::delete('/articles/{id}', [UserController::class, 'destroy'])->name('articles.destroy');
+    Route::get('/articles/{id}/comment', [UserController::class, 'comment'])->name('articles.createcomment');
+    Route::post('/articles/{id}/comment', [UserController::class, 'storeComment'])->name('articles.storecomment');
 });
 
 require __DIR__.'/auth.php';
